@@ -1,0 +1,111 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.avast.gradle:gradle-docker-compose-plugin:0.13.0'
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+    id "com.gorylenko.gradle-git-properties" version "2.2.2"
+    id "com.bmuschko.docker-spring-boot-application" version "6.6.0"
+}
+
+apply plugin: 'docker-compose'
+
+group = 'com.sivalabs'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.SR7")
+    set('commonsLangVersion', "3.10")
+    set('commonsIoVersion', "2.6")
+    set('swaggerVersion', "2.9.2")
+    set('testcontainersVersion', "1.14.3")
+    set('modelmapperVersion', "2.3.8")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.flywaydb:flyway-core'
+    compileOnly 'org.projectlombok:lombok'
+    testImplementation 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.webjars:bootstrap:4.4.1'
+    implementation 'org.webjars:font-awesome:5.8.1'
+    implementation 'org.webjars:vue:2.5.16'
+    implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
+    implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+    testImplementation "org.testcontainers:localstack:${testcontainersVersion}"
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+springBoot {
+    buildInfo()
+}
+
+bootJar {
+    //launchScript()
+}
+bootBuildInfo.mustRunAfter processResources
+bootBuildImage {
+    imageName = "sivaprasadreddy/spring-boot-aws-pulumi-demo"
+}
+
+dockerCompose {
+    environment.put 'TMPDIR', "/private"
+    useComposeFiles = ['docker-compose.yml']
+}
+
+compileJava.dependsOn(processResources)
+bootRun {
+    args = ["--spring.profiles.active=local"]
+}
+bootRun.dependsOn composeUp
+
+test {
+    useJUnitPlatform()
+    test {
+        testLogging {
+            events "skipped", "failed"
+            exceptionFormat "full"
+            showStandardStreams = false
+        }
+    }
+}

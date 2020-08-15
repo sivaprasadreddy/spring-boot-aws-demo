@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+
+  todolist-db:
+    image: postgres:10.7
+    container_name: todolist-db
+    environment:
+      - POSTGRES_USER=siva
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=appdb
+      - PGDATA=/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  localstack:
+    image: localstack/localstack:0.10.8
+    ports:
+      - "4572:4572"
+      - "4576:4576"
+    environment:
+      - SERVICES=s3,sqs
+      - DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR}
+    volumes:
+      - "${TMPDIR:-/private}:/private"
+      - "/var/run/docker.sock:/var/run/docker.sock"
