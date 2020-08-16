@@ -1,0 +1,7 @@
+config:
+  aws:region: us-east-1
+  spring-boot-aws-pulumi-demo:db_name: todolistdb
+  spring-boot-aws-pulumi-demo:db_password:
+    secure: AAABALU0QkzYBWzGT3uzxflUtRvxSUaAnJCwfNvPfD+9AdEoMqVV9JR2
+  spring-boot-aws-pulumi-demo:db_username: sivalabs
+  spring-boot-aws-pulumi-demo:environment: dev
