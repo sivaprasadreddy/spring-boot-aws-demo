@@ -3,19 +3,18 @@ import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
 const config = new pulumi.Config();
-const environment = config.require("environment")
-const envPrefix = environment + "-"
-const withEnvPrefix = (name : string) => envPrefix + name;
-const withEnvAppPrefix = (name : string) => "todolist-pulumi-" + withEnvPrefix(name);
-
-const vpcName = withEnvAppPrefix("vpc");
-const clusterName = withEnvAppPrefix("cluster");
+const environment = config.require("environment");
+const appName = "todolist-pulumi";
+const withAppEnvPrefix = (name : string) => appName + "-" + environment + "-" + name;
 
 const dbName = config.require("db_name");
 const dbUsername = config.require("db_username");
 const dbPassword = config.requireSecret("db_password");
 
-const queue_name = withEnvAppPrefix("queue");
+const vpcName = withAppEnvPrefix("vpc");
+const clusterName = withAppEnvPrefix("cluster");
+const queue_name = withAppEnvPrefix("queue");
+const dockerImage = "sivaprasadreddy/spring-boot-aws-pulumi-demo";
 
 const vpc = new awsx.ec2.Vpc(vpcName, {
   numberOfAvailabilityZones: 2,
@@ -49,7 +48,7 @@ const subnetGroup = new aws.rds.SubnetGroup("dbsubnets", {
   subnetIds: vpc.publicSubnetIds,
 });
 
-const db = new aws.rds.Instance(withEnvAppPrefix("db"), {
+const db = new aws.rds.Instance(withAppEnvPrefix("db"), {
   engine: "postgres",
   instanceClass: aws.rds.InstanceTypes.T2_Micro,
   allocatedStorage: 5,
@@ -61,38 +60,38 @@ const db = new aws.rds.Instance(withEnvAppPrefix("db"), {
   skipFinalSnapshot: true,
   publiclyAccessible: environment !== "prod",
   tags: {
-    Name: withEnvAppPrefix("db"),
+    Name: withAppEnvPrefix("db"),
     Environment: environment
   },
 });
 
 const connectionString = pulumi.interpolate `jdbc:postgresql://${db.endpoint}/${dbName}?sslmode=disable`;
 
-const alb = new awsx.lb.ApplicationLoadBalancer(withEnvAppPrefix("alb"), {
+const alb = new awsx.lb.ApplicationLoadBalancer(withAppEnvPrefix("alb"), {
   vpc,
   external: true,
   securityGroups: cluster.securityGroups,
   tags: {
-    Name: withEnvAppPrefix("alb"),
+    Name: withAppEnvPrefix("alb"),
     Environment: environment
   },
 });
 
-const tg = alb.createTargetGroup(withEnvAppPrefix("tg"), {
+const tg = alb.createTargetGroup(withAppEnvPrefix("tg"), {
   vpc,
-  port: 80,
+  port: 8080,
   healthCheck: {
     path: "/actuator/health",
     timeout: 60,
     interval: 120,
   },
   tags: {
-    Name: withEnvAppPrefix("tg"),
+    Name: withAppEnvPrefix("tg"),
     Environment: environment
   },
 });
 
-const listener = tg.createListener(withEnvAppPrefix("listener"), {
+const listener = tg.createListener(withAppEnvPrefix("listener"), {
   vpc,
   port: 80,
   external: true,
@@ -110,28 +109,30 @@ const policy = new aws.iam.RolePolicy("allow-sqs-policy", {
     Statement: [{
       Sid: "AllowSQSAccess",
       Effect: "Allow",
-      Resource: "*",
+      Resource: queue.arn,
       Action: "sqs:*",
     }],
   },
 });
 
-const service = new awsx.ecs.FargateService(withEnvAppPrefix("service"), {
+const logGroup = new aws.cloudwatch.LogGroup("spring-boot-aws-pulumi-demo-logs", {
+  retentionInDays: 7,
+});
+
+const service = new awsx.ecs.FargateService(withAppEnvPrefix("service"), {
   cluster,
   desiredCount: 1,
   taskDefinitionArgs: {
     taskRole: allowSqsRole,
+    logGroup: logGroup,
     containers: {
       service: {
-        image: awsx.ecs.Image.fromDockerBuild("spring-boot-aws-pulumi-demo",{
-          context: "../",
-          dockerfile: "../Dockerfile",
-        }),
+        image: dockerImage,
         portMappings: [listener],
         memory: 1024,
         cpu: 256,
         environment: [
-          {name: "SERVER_PORT", value: "80"},
+          {name: "SERVER_PORT", value: "8080"},
           {name: "SPRING_PROFILES_ACTIVE", value: "aws"},
           {name: "MYAPP_QUEUENAME", value: queue_name},
           {name: "SPRING_DATASOURCE_DRIVER_CLASS_NAME", value: "org.postgresql.Driver"},
