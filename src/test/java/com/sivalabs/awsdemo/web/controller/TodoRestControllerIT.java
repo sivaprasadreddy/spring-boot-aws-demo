@@ -4,14 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sivalabs.awsdemo.common.AbstractIntegrationTest;
 import com.sivalabs.awsdemo.entity.Todo;
 import com.sivalabs.awsdemo.repo.TodoRepository;
-import com.sivalabs.todolist.common.AbstractIntegrationTest;
-import com.sivalabs.todolist.entity.Todo;
-import com.sivalabs.todolist.repo.TodoRepository;
-import com.sivalabs.todolist.service.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -20,12 +15,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,9 +24,6 @@ class TodoRestControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private MessageService messageService;
 
     @Autowired
     private TodoRepository todoRepository;
@@ -47,8 +35,6 @@ class TodoRestControllerIT extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        doNothing().when(messageService).sendMessage(any(String.class));
-
         todoRepository.deleteAll();
 
         this.todoList = new ArrayList<>();

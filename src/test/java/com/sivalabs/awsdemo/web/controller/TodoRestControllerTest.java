@@ -3,9 +3,6 @@ package com.sivalabs.awsdemo.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sivalabs.awsdemo.entity.Todo;
 import com.sivalabs.awsdemo.service.TodoService;
-import com.sivalabs.todolist.entity.Todo;
-import com.sivalabs.todolist.service.MessageService;
-import com.sivalabs.todolist.service.TodoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +18,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,9 +30,6 @@ class TodoRestControllerTest {
 
     @MockBean
     private TodoService todoService;
-
-    @MockBean
-    private MessageService messageService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -51,8 +42,6 @@ class TodoRestControllerTest {
         this.todoList.add(new Todo(1L, "First Todo", LocalDateTime.now(), null));
         this.todoList.add(new Todo(2L, "Second Todo", LocalDateTime.now(), null));
         this.todoList.add(new Todo(3L, "Third Todo", LocalDateTime.now(), null));
-
-        doNothing().when(messageService).sendMessage(any(String.class));
     }
 
     @Test

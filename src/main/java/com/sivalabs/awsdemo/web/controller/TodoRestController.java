@@ -2,9 +2,6 @@ package com.sivalabs.awsdemo.web.controller;
 
 import java.util.List;
 
-import com.sivalabs.todolist.entity.Todo;
-import com.sivalabs.todolist.service.MessageService;
-import com.sivalabs.todolist.service.TodoService;
 import com.sivalabs.awsdemo.entity.Todo;
 import com.sivalabs.awsdemo.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TodoRestController {
 
     private final TodoService todoService;
-    private final MessageService messageService;
 
     @GetMapping
     public List<Todo> getTodos() {
@@ -36,7 +32,6 @@ public class TodoRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Todo saveTodo(@RequestBody Todo todo) {
-        messageService.sendMessage(todo.getContent());
         return todoService.saveTodo(todo);
     }
 
