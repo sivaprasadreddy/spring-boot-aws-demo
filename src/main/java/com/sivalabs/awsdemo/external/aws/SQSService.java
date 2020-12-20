@@ -1,4 +1,4 @@
-package com.sivalabs.awsdemo.service;
+package com.sivalabs.awsdemo.external.aws;
 
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.AmazonSQSException;

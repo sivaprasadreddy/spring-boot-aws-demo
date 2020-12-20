@@ -26,7 +26,7 @@ public class AwsLocalConfig {
     public static final AWSCredentials TEST_CREDENTIALS = new BasicAWSCredentials(TEST_ACCESS_KEY, TEST_SECRET_KEY);
 
     @Autowired
-    private AwsProperties awsProperties;
+    private ApplicationProperties properties;
 
     static {
         System.setProperty("com.amazonaws.sdk.disableCbor", "true");
@@ -36,7 +36,7 @@ public class AwsLocalConfig {
     @Primary
     public AmazonS3 amazonS3Client() {
         AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard().enablePathStyleAccess();
-        if (awsProperties.getEndpointUri() != null && awsProperties.getEndpointUri().trim().length() != 0) {
+        if (properties.getEndpointUri() != null && properties.getEndpointUri().trim().length() != 0) {
             builder.withEndpointConfiguration(getEndpointConfiguration());
             builder.withCredentials(getCredentialsProvider());
         }
@@ -47,7 +47,7 @@ public class AwsLocalConfig {
     @Primary
     public AmazonSQSAsync amazonSQSAsync() {
         AmazonSQSAsyncClientBuilder builder = AmazonSQSAsyncClientBuilder.standard();
-        if (awsProperties.getEndpointUri() != null && awsProperties.getEndpointUri().trim().length() != 0) {
+        if (properties.getEndpointUri() != null && properties.getEndpointUri().trim().length() != 0) {
             builder.withEndpointConfiguration(getEndpointConfiguration());
             builder.withCredentials(getCredentialsProvider());
         }
@@ -59,6 +59,6 @@ public class AwsLocalConfig {
     }
 
     private EndpointConfiguration getEndpointConfiguration() {
-        return new EndpointConfiguration(awsProperties.getEndpointUri(), awsProperties.getRegion());
+        return new EndpointConfiguration(properties.getEndpointUri(), properties.getRegion());
     }
 }

@@ -1,19 +1,18 @@
 package com.sivalabs.awsdemo.web.controller;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sivalabs.awsdemo.entity.Todo;
 import com.sivalabs.awsdemo.service.TodoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -41,7 +40,6 @@ class TodoRestControllerTest {
 
     @BeforeEach
     void setUp() {
-
         this.todoList = new ArrayList<>();
         this.todoList.add(new Todo(1L, "First Todo", LocalDateTime.now(), null));
         this.todoList.add(new Todo(2L, "Second Todo", LocalDateTime.now(), null));

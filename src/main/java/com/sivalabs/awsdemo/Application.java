@@ -1,6 +1,6 @@
 package com.sivalabs.awsdemo;
 
-import com.sivalabs.awsdemo.config.AwsProperties;
+import com.sivalabs.awsdemo.config.ApplicationProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.CommandLineRunner;
@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
 @SpringBootApplication
-@EnableConfigurationProperties({ AwsProperties.class})
+@EnableConfigurationProperties({ ApplicationProperties.class})
 @EnableScheduling
 public class Application implements CommandLineRunner {
 
