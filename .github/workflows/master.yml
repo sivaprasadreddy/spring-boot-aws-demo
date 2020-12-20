@@ -3,9 +3,7 @@ name: Master Branch CI
 on:
   push:
     branches:
-      - infra
       - master
-      - release
 jobs:
   test:
     name: Unit & Integration Tests

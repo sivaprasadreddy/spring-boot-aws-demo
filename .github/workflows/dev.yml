@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - '*'
-      - '!infra'
+      - '!pulumi'
+      - '!aws-cdk'
       - '!master'
       - '!release'
 
