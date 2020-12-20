@@ -3,23 +3,31 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.avast.gradle:gradle-docker-compose-plugin:0.13.0'
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:${docker_compose_plugin_version}"
+        classpath 'org.owasp:dependency-check-gradle:5.2.1'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.3.3.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-    id 'java'
-    id "com.gorylenko.gradle-git-properties" version "2.2.2"
-    id "com.bmuschko.docker-spring-boot-application" version "6.6.0"
+    id 'java-library'
+    id 'org.springframework.boot' version "${spring_boot_version}"
+    id 'io.spring.dependency-management' version "${spring_dependency_management_version}"
+    id "com.gorylenko.gradle-git-properties" version "${git_properties_plugin_version}"
+    id "com.github.spotbugs" version "4.5.0" apply false
+    id "org.sonarqube" version "3.0" apply false
 }
-
+apply plugin: 'idea'
 apply plugin: 'docker-compose'
+apply from: 'gradle/tests.gradle'
+apply from: 'gradle/static-checks.gradle'
 
 group = 'com.sivalabs'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 configurations {
     compileOnly {
@@ -29,21 +37,12 @@ configurations {
 
 repositories {
     mavenCentral()
-}
-
-ext {
-    set('springCloudVersion', "Hoxton.SR7")
-    set('commonsLangVersion', "3.10")
-    set('commonsIoVersion', "2.6")
-    set('swaggerVersion', "2.9.2")
-    set('testcontainersVersion', "1.14.3")
-    set('modelmapperVersion', "2.3.8")
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
     implementation "org.springframework.cloud:spring-cloud-starter-aws-messaging"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -52,28 +51,29 @@ dependencies {
     testImplementation 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.webjars:bootstrap:4.4.1'
-    implementation 'org.webjars:font-awesome:5.8.1'
-    implementation 'org.webjars:vue:2.5.16'
-    implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
-    implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+    implementation "org.webjars:bootstrap:${bootstrap_version}"
+    implementation "org.webjars:font-awesome:${font_awesome_version}"
+    implementation "org.webjars:vue:${vue_version}"
+    implementation "io.springfox:springfox-boot-starter:${swagger_version}"
+
+    implementation "org.apache.commons:commons-lang3:${commons_lang_version}"
+    implementation "commons-io:commons-io:${commons_io_version}"
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
-    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
-    testImplementation "org.testcontainers:localstack:${testcontainersVersion}"
-
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:postgresql"
+    testImplementation "org.testcontainers:localstack"
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
+        mavenBom "org.testcontainers:testcontainers-bom:${testcontainers_version}"
     }
 }
 
@@ -82,11 +82,11 @@ springBoot {
 }
 
 bootJar {
-    //launchScript()
+    launchScript()
 }
-bootBuildInfo.mustRunAfter processResources
+
 bootBuildImage {
-    imageName = "sivaprasadreddy/spring-boot-aws-pulumi-demo"
+    imageName = "sivaprasadreddy/spring-boot-awsdemo"
 }
 
 dockerCompose {
@@ -94,19 +94,19 @@ dockerCompose {
     useComposeFiles = ['docker-compose.yml']
 }
 
-compileJava.dependsOn(processResources)
+compileJava.dependsOn processResources
+processResources.dependsOn bootBuildInfo
+
 bootRun {
     args = ["--spring.profiles.active=local"]
 }
 bootRun.dependsOn composeUp
 
-test {
-    useJUnitPlatform()
-    test {
-        testLogging {
-            events "skipped", "failed"
-            exceptionFormat "full"
-            showStandardStreams = false
-        }
-    }
+gitProperties {
+    failOnNoGitDirectory = false
+    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
+}
+
+wrapper {
+    gradleVersion = "6.7.1"
 }

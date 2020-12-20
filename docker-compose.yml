@@ -1,8 +1,8 @@
 version: '3.8'
 services:
 
-  todolist-db:
-    image: postgres:10.7
+  awsdemo-db:
+    image: postgres:12.3
     environment:
       - POSTGRES_USER=siva
       - POSTGRES_PASSWORD=secret

@@ -1,13 +1,13 @@
 version: '3.8'
 services:
 
-  spring-boot-todolist:
+  spring-boot-aws-demo:
     build: .
-    image: sivaprasadreddy/spring-boot-aws-pulumi-demo
+    image: sivaprasadreddy/spring-boot-aws-demo
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://todolist-db:5432/appdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://awsdemo-db:5432/appdb
       - SPRING_DATASOURCE_USERNAME=siva
       - SPRING_DATASOURCE_PASSWORD=secret
     ports:
