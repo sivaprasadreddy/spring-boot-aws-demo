@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+</head>
+
+<body>
+<div th:fragment="msgs">
+    <div>
+        <h2>Messages from SQS</h2>
+        <hr/>
+        <button type="button" class="btn btn-secondary"
+                v-on:click="loadMsgs()">Reload
+        </button>
+        <form class="form-inline" @submit.prevent="saveMessage"
+              style="padding-bottom: 5px;">
+            <div class="form-group col-md-8">
+                <label for="msgText" class="sr-only">Message</label>
+                <input type="text" id="msgText"
+                       class="form-control form-control-lg col-md-12"
+                       v-model="newMsg.content"
+                       placeholder="Enter message">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Add</button>
+        </form>
+    </div>
+    <div class="col-md-10">
+        <ul class="list-group">
+            <table class="table table-striped">
+                <tbody>
+                <tr v-for="t in msgs">
+                    <td style="width: 90%">{{t.content}}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger"
+                                v-on:click="deleteMessage(t.id)">Delete
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

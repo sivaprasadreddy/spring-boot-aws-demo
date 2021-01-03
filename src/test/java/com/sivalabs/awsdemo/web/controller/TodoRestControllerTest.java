@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +40,9 @@ class TodoRestControllerTest {
     @BeforeEach
     void setUp() {
         this.todoList = new ArrayList<>();
-        this.todoList.add(new Todo(1L, "First Todo", LocalDateTime.now(), null));
-        this.todoList.add(new Todo(2L, "Second Todo", LocalDateTime.now(), null));
-        this.todoList.add(new Todo(3L, "Third Todo", LocalDateTime.now(), null));
+        this.todoList.add(new Todo(1L, "First Todo"));
+        this.todoList.add(new Todo(2L, "Second Todo"));
+        this.todoList.add(new Todo(3L, "Third Todo"));
     }
 
     @Test
@@ -59,7 +58,7 @@ class TodoRestControllerTest {
     void shouldCreateNewTodo() throws Exception {
         given(todoService.saveTodo(any(Todo.class))).willAnswer((invocation) -> invocation.getArgument(0));
 
-        Todo todo = new Todo(null, "New Todo", LocalDateTime.now(), null);
+        Todo todo = new Todo(null, "New Todo");
         this.mockMvc.perform(post("/api/todos")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(todo)))
@@ -71,10 +70,9 @@ class TodoRestControllerTest {
     @Test
     void shouldDeleteTodo() throws Exception {
         Long todoId = 1L;
-        Todo todo = new Todo(todoId, "Todo", LocalDateTime.now(), null);
-        given(todoService.deleteTodo(todo.getId())).willReturn(true);
+        given(todoService.deleteTodo(todoId)).willReturn(true);
 
-        this.mockMvc.perform(delete("/api/todos/{id}", todo.getId()))
+        this.mockMvc.perform(delete("/api/todos/{id}", todoId))
                 .andExpect(status().isNoContent());
     }
 }

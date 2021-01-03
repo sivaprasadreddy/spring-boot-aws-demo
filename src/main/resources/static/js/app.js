@@ -2,10 +2,13 @@ new Vue({
     el: '#app',
     data: {
         todos: [],
-        newTodo: {}
+        msgs: [],
+        newTodo: {},
+        newMsg: {}
     },
     created: function () {
         this.loadTodos();
+        this.loadMsgs();
     },
     methods: {
         loadTodos() {
@@ -14,7 +17,6 @@ new Vue({
                 self.todos = data
             });
         },
-
         saveTodo() {
             let self = this;
 
@@ -29,7 +31,6 @@ new Vue({
                 }
             });
         },
-
         deleteTodo(id) {
             let self = this;
 
@@ -40,7 +41,39 @@ new Vue({
                     self.loadTodos();
                 }
             });
-        }
+        },
+
+      loadMsgs() {
+        let self = this;
+        $.getJSON("api/messages", function (data) {
+          self.msgs = data
+        });
+      },
+      saveMessage() {
+        let self = this;
+
+        $.ajax({
+          type: "POST",
+          url: 'api/messages',
+          data: JSON.stringify(this.newMsg),
+          contentType: "application/json",
+          success: function () {
+            self.newMsg = {};
+            self.loadMsgs();
+          }
+        });
+      },
+      deleteMessage(id) {
+        let self = this;
+
+        $.ajax({
+          type: "DELETE",
+          url: 'api/messages/' + id,
+          success: function () {
+            self.loadMsgs();
+          }
+        });
+      }
     },
     computed: {}
 });

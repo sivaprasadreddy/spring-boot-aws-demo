@@ -3,13 +3,12 @@ package com.sivalabs.awsdemo.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sivalabs.awsdemo.common.AbstractIntegrationTest;
 import com.sivalabs.awsdemo.entity.Todo;
-import com.sivalabs.awsdemo.repo.TodoRepository;
+import com.sivalabs.awsdemo.repository.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,11 +39,11 @@ class TodoRestControllerIT extends AbstractIntegrationTest {
         todoRepository.deleteAll();
 
         this.todoList = new ArrayList<>();
-        this.todoList.add(new Todo(1L, "First Todo", LocalDateTime.now(), null));
-        this.todoList.add(new Todo(2L, "Second Todo", LocalDateTime.now(), null));
-        this.todoList.add(new Todo(3L, "Third Todo", LocalDateTime.now(), null));
+        this.todoList.add(new Todo(1L, "First Todo"));
+        this.todoList.add(new Todo(2L, "Second Todo"));
+        this.todoList.add(new Todo(3L, "Third Todo"));
 
-        todoList = todoRepository.saveAll(todoList);
+        this.todoList = todoRepository.saveAll(todoList);
     }
 
     @Test
@@ -56,7 +55,7 @@ class TodoRestControllerIT extends AbstractIntegrationTest {
 
     @Test
     void shouldCreateNewTodo() throws Exception {
-        Todo todo = new Todo(null, "New Todo", LocalDateTime.now(), null);
+        Todo todo = new Todo(null, "New Todo");
         this.mockMvc.perform(post("/api/todos")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(todo)))

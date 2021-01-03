@@ -6,6 +6,8 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.sns.AmazonSNSAsync;
+import com.amazonaws.services.sns.AmazonSNSAsyncClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -14,8 +16,7 @@ import org.springframework.context.annotation.Primary;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.*;
 
 @TestConfiguration
 public class LocalStackConfig {
@@ -30,14 +31,14 @@ public class LocalStackConfig {
     static {
         System.setProperty("com.amazonaws.sdk.disableCbor", "true");
         localStackContainer = new LocalStackContainer(DockerImageName.parse("localstack/localstack:0.11.2"))
-            .withServices(S3,SQS)
+            .withServices(S3,SQS, SNS)
             .withExposedPorts(4566);
         localStackContainer.start();
     }
 
     @Bean
     @Primary
-    public AmazonS3 localstackAmazonS3() {
+    public AmazonS3 amazonS3() {
         return AmazonS3ClientBuilder.standard()
             .enablePathStyleAccess()
             .withEndpointConfiguration(localStackContainer.getEndpointConfiguration(SQS))
@@ -47,9 +48,18 @@ public class LocalStackConfig {
 
     @Bean
     @Primary
-    public AmazonSQSAsync localstackAmazonSQSAsync() {
+    public AmazonSQSAsync amazonSQS() {
         return AmazonSQSAsyncClientBuilder.standard()
             .withEndpointConfiguration(localStackContainer.getEndpointConfiguration(SQS))
+            .withCredentials(getCredentialsProvider())
+            .build();
+    }
+
+    @Bean
+    @Primary
+    public AmazonSNSAsync amazonSNS() {
+        return AmazonSNSAsyncClientBuilder.standard()
+            .withEndpointConfiguration(localStackContainer.getEndpointConfiguration(SNS))
             .withCredentials(getCredentialsProvider())
             .build();
     }

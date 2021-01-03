@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+</head>
+
+<body>
+<div th:fragment="todos">
+    <div>
+        <h2>Todos from Database(RDS)</h2>
+        <hr/>
+        <form class="form-inline" @submit.prevent="saveTodo"
+              style="padding-bottom: 5px;">
+            <div class="form-group col-md-8">
+                <label for="todoText" class="sr-only">Todo</label>
+                <input type="text" id="todoText"
+                       class="form-control form-control-lg col-md-12"
+                       v-model="newTodo.content"
+                       placeholder="Enter todo">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Add</button>
+        </form>
+    </div>
+    <div class="col-md-10">
+        <ul class="list-group">
+            <table class="table table-striped">
+                <tbody>
+                <tr v-for="t in todos">
+                    <td style="width: 90%">{{t.content}}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger"
+                                v-on:click="deleteTodo(t.id)">Delete
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

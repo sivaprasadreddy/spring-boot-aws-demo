@@ -6,19 +6,15 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SQSService {
     private final AmazonSQSAsync amazonSQS;
-
-    @Autowired
-    public SQSService(AmazonSQSAsync amazonSQS) {
-        this.amazonSQS = amazonSQS;
-    }
 
     public void createQueue(String queueName) {
         CreateQueueRequest createQueueRequest = new CreateQueueRequest(queueName)

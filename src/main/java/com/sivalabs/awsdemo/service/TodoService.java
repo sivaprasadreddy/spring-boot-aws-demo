@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.sivalabs.awsdemo.entity.Todo;
-import com.sivalabs.awsdemo.repo.TodoRepository;
+import com.sivalabs.awsdemo.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Sort;

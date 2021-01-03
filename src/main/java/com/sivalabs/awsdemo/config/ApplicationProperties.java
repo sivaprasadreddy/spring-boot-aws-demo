@@ -10,4 +10,5 @@ public class ApplicationProperties {
     private String endpointUri;
     private String region;
     private String queueName;
+    private String topicName;
 }

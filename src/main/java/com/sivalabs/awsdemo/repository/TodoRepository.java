@@ -1,4 +1,4 @@
-package com.sivalabs.awsdemo.repo;
+package com.sivalabs.awsdemo.repository;
 
 import com.sivalabs.awsdemo.entity.Todo;
 import org.springframework.data.jpa.repository.JpaRepository;

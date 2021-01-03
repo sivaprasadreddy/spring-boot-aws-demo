@@ -5,3 +5,6 @@
 
 awslocal sqs create-queue --queue-name test_queue
 awslocal sqs list-queues
+
+awslocal sns create-topic --name test_topic
+awslocal sns list-topics
